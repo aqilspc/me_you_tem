@@ -23,8 +23,8 @@
                                         @if(Auth::user()->role=='admin')
                                          <li><a href="{{url('admin_area')}}">Admin Area</a></li>
                                         @else
-                                        <li><a href="{{url('about')}}">About</a></li>
-                                        <li><a href="{{url('pesan_order_send/0')}}">Pesan</a></li>
+                                        <!-- <li><a href="{{url('about')}}">About</a></li> -->
+                                        <li><a href="{{url('pesan_order_send/0')}}">Chat</a></li>
                                         <li><a href="{{url('shop')}}">Shop</a></li>
                                         <li><a href="{{url('my_order')}}">My Order</a></li>
                                         @endif

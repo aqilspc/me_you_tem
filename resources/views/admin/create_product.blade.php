@@ -17,21 +17,27 @@
                                 @csrf
                                     <div class="row">
                                         <div class="col-xl-6 col-lg-6 col-md-6 mb-30">
+                                            <label>Product Name</label>
                                             <input type="text" placeholder="Product Name" name="nama_barang">
                                         </div>
                                         <div class="col-xl-6 col-lg-6 col-md-6 mb-30">
+                                            <label>Product number</label>
                                             <input type="text" placeholder="Product number" name="no_barang">
                                         </div>
                                         <div class="col-xl-6 col-lg-6 col-md-6 mb-30">
+                                             <label>Stock</label>
                                             <input type="text" placeholder="Stock" name="stok">
                                         </div>
                                         <div class="col-xl-6 col-lg-6 col-md-6 mb-30">
+                                             <label>Image</label>
                                             <input type="file" placeholder="Date Order" name="gambar">
                                         </div>
                                         <div class="col-xl-6">
+                                             <label>Price</label>
                                             <input type="text" placeholder="Price" name="harga">
                                         </div>
                                         <div class="col-xl-6">
+                                            <label>Product description</label>
                                             <textarea name="keterangan" cols="30" rows="10"
                                                 placeholder="Product description"></textarea>
                                                 <button class="btn theme-btn mt-30" type="submit">Sumbit </button>

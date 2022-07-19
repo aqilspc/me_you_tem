@@ -20,33 +20,65 @@
             <!-- Banner Area End -->
 
             <!-- Service Archive -->
-            <section class="service-archive pt-120 pb-60" id="pageinfo" style="padding-top: 20px;">
-                  <h2 align="center">NEW ARRIVALS</h2>
-                <div class="container">
+            @if(Auth::check())
+                @if(Auth::user()->role != 'admin')
+                <section class="service-archive pt-120 pb-60" id="pageinfo" style="padding-top: 20px;">
+                      <h2 align="center">NEW ARRIVALS</h2>
+                    <div class="container">
 
-                    <div class="row">
-                        @foreach($data as $dt)
-                        <div class="col-xl-4 col-lg-4 col-md-6">
-                            <div class="service-inner mb-50">
-                                <div class="service-img">
-                                    <img src="{{$dt->gambar1}}" alt="">
-                                </div>
-                                <div class="service-arch-content text-center">
-                                    <div class="service-icon">
-                                        <img src="{{$dt->gambar2}}" alt="">
+                        <div class="row">
+                            @foreach($data as $dt)
+                            <div class="col-xl-4 col-lg-4 col-md-6">
+                                <div class="service-inner mb-50">
+                                    <div class="service-img">
+                                        <img src="{{$dt->gambar1}}" alt="">
                                     </div>
-                                    <h4><a href="#">{{$dt->judul}}</a></h4>
-                                    <p> {{mb_strimwidth($dt->isi_1, 0, 125, "")}}</p>
-                                    <ul>
-                                        <a class="theme-btn" href="{{url('detail/'.$dt->id)}}"><i class="fas fa-eye"></i> Read More</a>
-                                    </ul>
+                                    <div class="service-arch-content text-center">
+                                        <div class="service-icon">
+                                            <img src="{{$dt->gambar2}}" alt="">
+                                        </div>
+                                        <h4><a href="#">{{$dt->judul}}</a></h4>
+                                        <p> {{mb_strimwidth($dt->isi_1, 0, 125, "")}}</p>
+                                        <ul>
+                                            <a class="theme-btn" href="{{url('detail/'.$dt->id)}}"><i class="fas fa-eye"></i> Read More</a>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
+                            @endforeach
                         </div>
-                        @endforeach
                     </div>
-                </div>
-            </section>
+                </section>
+                @endif
+            @else
+             <section class="service-archive pt-120 pb-60" id="pageinfo" style="padding-top: 20px;">
+                      <h2 align="center">NEW ARRIVALS</h2>
+                    <div class="container">
+
+                        <div class="row">
+                            @foreach($data as $dt)
+                            <div class="col-xl-4 col-lg-4 col-md-6">
+                                <div class="service-inner mb-50">
+                                    <div class="service-img">
+                                        <img src="{{$dt->gambar1}}" alt="">
+                                    </div>
+                                    <div class="service-arch-content text-center">
+                                        <div class="service-icon">
+                                            <img src="{{$dt->gambar2}}" alt="">
+                                        </div>
+                                        <h4><a href="#">{{$dt->judul}}</a></h4>
+                                        <p> {{mb_strimwidth($dt->isi_1, 0, 125, "")}}</p>
+                                        <ul>
+                                            <a class="theme-btn" href="{{url('detail/'.$dt->id)}}"><i class="fas fa-eye"></i> Read More</a>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </section>
+            @endif
             <!-- Service Archive -->
         </main>
 @endsection

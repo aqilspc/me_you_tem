@@ -25,7 +25,7 @@
                     </div>
                     <div class="col-xl-3 col-lg-3 col-md-12">
                         <div class="priceing-box text-center mb-30">
-                            <h6>Community</h6>
+                            <h6>Chat</h6>
                             <a class="border-btn" href="{{url('admin_area/community')}}">Manage</a>
                         </div>
                     </div>

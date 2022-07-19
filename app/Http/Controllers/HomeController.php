@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use Carbon\Carbon;
 use Auth;
+use Session;
 class HomeController extends Controller
 {
     /**
@@ -290,18 +291,30 @@ class HomeController extends Controller
     {
         if(Auth::user()->role=='admin')
         {
-            $data = DB::table('transaksi as trs')
+             $data = DB::table('transaksi as trs')
             ->join('users as us','us.id','=','trs.id_user')
-            ->join('barang as br','br.id_barang','=','trs.id_barang')
-            ->select('us.name','trs.*','br.*')
+            ->join('transaksi_item as trsi','trsi.id_transaksi','=','trs.id')
+            ->join('barang as br','br.id_barang','=','trsi.id_barang')
+            ->select('us.name','trs.*','br.*','trsi.*')
             ->where('trs.id',$id)
+            ->groupBy('trsi.id_transaksi')
             ->first();
             $penilaian = DB::table('penilaian')->where('id_transaksi',$id)->first();
             if(!$data)
             {
                 return redirect('admin_area');
             }
-            return view('admin.order_detail',compact('data','penilaian'));
+            $item = DB::table('transaksi as trs')
+            ->join('users as us','us.id','=','trs.id_user')
+            ->join('transaksi_item as trsi','trsi.id_transaksi','=','trs.id')
+            ->join('barang as br','br.id_barang','=','trsi.id_barang')
+            ->select('us.name','trs.*','br.*','trsi.*',DB::raw('count(trsi.id_barang) as qty_barang'))
+            ->where('trs.id',$id)
+            ->groupBy('trsi.id_barang')
+            ->get();
+            //return $item;
+            $penilaian = DB::table('penilaian')->where('id_transaksi',$id)->first();
+            return view('admin.order_detail',compact('data','penilaian','id','item'));
         }else
         {
             return redirect()->back();
@@ -313,18 +326,25 @@ class HomeController extends Controller
         DB::table('transaksi')->where('id',$id)->update(['status'=>$status]);
         if($status==1 || $status=='1')
         {
-            $data = DB::table('transaksi')->where('id',$id)->select('id_barang','qty')->first();
-            $barang = DB::table('barang')->where('id_barang',$data->id_barang)
-            ->select('stok')->first();
-            $jadinya = $barang->stok - $data->qty;
-             DB::table('barang')->where('id_barang',$data->id_barang)->update(['stok'=>$jadinya]);
+            $data = DB::table('transaksi')->where('id',$id)->select('id')->first();
+            $item = DB::table('transaksi_item')->where('id_transaksi',$data->id)->select(DB::raw('id_barang,sum(qty) as qty_barang'))->groupBy('id_barang')->get();
+            foreach ($item as $key => $value) {
+                $barang = DB::table('barang')->where('id_barang',$value->id_barang)
+                ->select('stok')->first();
+                $jadinya = $barang->stok - $value->qty_barang;
+                 DB::table('barang')->where('id_barang',$value->id_barang)->update(['stok'=>$jadinya]);
+            } 
+            DB::table('transaksi')->where('id',$id)->update(['status'=>1]);
+        }else{
+            DB::table('transaksi')->where('id',$id)->update(['status'=>2,'bukti_trf'=>NULL]);
         }
-        return redirect('admin_area/order');
+        return redirect()->back();
     }
 
     public function purchaseNow(Request $request)
     {
         //return 'test';
+       // return $request->all();
         $barang = DB::table('barang')->where('id_barang',$request->id_barang)
         ->select('stok')->first();
         if($barang->stok < $request->qty)
@@ -337,19 +357,31 @@ class HomeController extends Controller
             ->with('success','The product out of stock!');
         }else
         {
+            $trsSes = Session::get('trans');
+            if($trsSes==null){
+                    $trs = DB::table('transaksi')->insertGetId([
+                       // 'qty'=>$request->qty,
+                        'id_user'=>Auth::user()->id,
+                        'date'=>Carbon::now()->format('Y-m-d'),
+                        'status'=>3,
+                ]);
+                Session::put('trans',$trs);
+                DB::table('transaksi_item')->insert([
+                    'id_barang'=>$request->id_barang
+                    ,'id_transaksi'=>$trs
+                    ,'qty'=>$request->qty
+                ]);
+            }else{
+                DB::table('transaksi_item')->insert([
+                    'id_barang'=>$request->id_barang
+                    ,'id_transaksi'=>$trsSes
+                    ,'qty'=>$request->qty
+                    ,'created_at'=>Carbon::now()->toDateTimeString(),
+                ]);
+            }
+           // $total = $request->qty * $request->harga;
             
-            $total = $request->qty * $request->harga;
-            DB::table('transaksi')->insert([
-                'id_barang'=>$request->id_barang,
-                'qty'=>$request->qty,
-                'id_user'=>Auth::user()->id,
-                'no_telepon'=>$request->no_telepon,
-                'date'=>$request->date,
-                'status'=>0,
-                'total'=>$total,
-                'alamat'=>$request->alamat
-            ]);
-            return redirect('my_order');
+            return redirect()->back();
         }
     }
 

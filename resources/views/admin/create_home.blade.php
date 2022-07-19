@@ -32,7 +32,7 @@
                                                 placeholder="description 2"></textarea>
                                                  <small>Deskripsi 2</small>    
                                         </div>
-                                         <button class="btn theme-btn mt-30" type="submit">Sumbit </button>
+                                         <button class="btn theme-btn mt-30" type="submit">Submit </button>
                                          &nbsp;
                                          <a class="btn theme-btn mt-30" href="{{url('admin_area/home')}}" style="color: black;">Back</a>
                                     </div>

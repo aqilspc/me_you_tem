@@ -7,6 +7,7 @@ use DB;
 use Carbon\Carbon;
 use Auth;
 use App\Models\User;
+use Session;
 class WebController extends Controller
 {
     /**
@@ -102,7 +103,7 @@ class WebController extends Controller
         $data = DB::table('transaksi as trs')
             ->where('id_user',Auth::user()->id)
             ->get();
-        $keranjang = DB::table('keranjang')->where('id_user',Auth::user()->id)->get();
+        //$keranjang = DB::table('keranjang')->where('id_user',Auth::user()->id)->get();
         return view('web.order',compact('data'));
     }
 
@@ -110,23 +111,42 @@ class WebController extends Controller
     {
         $data = DB::table('transaksi as trs')
             ->join('users as us','us.id','=','trs.id_user')
-            ->join('barang as br','br.id_barang','=','trs.id_barang')
-            ->select('us.name','trs.*','br.*')
+            ->join('transaksi_item as trsi','trsi.id_transaksi','=','trs.id')
+            ->join('barang as br','br.id_barang','=','trsi.id_barang')
+            ->select('us.name','trs.*','br.*','trsi.*')
             ->where('trs.id',$id)
+            ->groupBy('trsi.id_transaksi')
             ->first();
         if(!$data)
         {
             return redirect('/');
         }
+         $item = DB::table('transaksi as trs')
+            ->join('users as us','us.id','=','trs.id_user')
+            ->join('transaksi_item as trsi','trsi.id_transaksi','=','trs.id')
+            ->join('barang as br','br.id_barang','=','trsi.id_barang')
+            ->select('us.name','trs.*','br.*','trsi.*',DB::raw('count(trsi.id_barang) as qty_barang'))
+            ->where('trs.id',$id)
+            ->groupBy('trsi.id_barang')
+            ->get();
+        //return $item;
         $penilaian = DB::table('penilaian')->where('id_transaksi',$id)->first();
-        return view('web.order_detail',compact('data','penilaian','id'));
+        return view('web.order_detail',compact('data','penilaian','id','item'));
     }
 
+    public function my_order_confirm(Request $request,$id)
+    {
+        DB::table('transaksi')->where('id',$id)->update(['status'=>0,'no_telepon'=>$request->no_telepon,'alamat'=>$request->alamat]);
+        Session::forget('trans');
+        return redirect()->back();
+    }
     public function upload_bukti(Request $request,$id)
     {
+       // return $request->file();
         $bukti = $this->uploadFile($request,'bukti_trf');
+        //return $bukti;
         DB::table('transaksi')->where('id',$id)->update(['bukti_trf'=>$bukti,'status'=>0]);
-        return redirect('my_order');
+        return redirect()->back();
     }
 
     public function insertPenilaian(Request $request){

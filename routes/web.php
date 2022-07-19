@@ -28,6 +28,7 @@ Route::get('/my_order/detail/{id}', [WebController::class, 'order_detail']);
 Route::post('/my_order_upload/{id}', [WebController::class, 'upload_bukti']);
 Route::post('/beri_penilaian/', [WebController::class, 'insertPenilaian']);
 Route::get('/shop_detail/{id}', [WebController::class, 'shop_detail']);
+Route::post('/my_order_confirm/{id}', [WebController::class, 'my_order_confirm']);
 Route::get('/pesan_order/{id}/{id_room}', [HomeController::class, 'messageUserTransaction']);
 Route::get('/pesan_order_send/{id}', [HomeController::class, 'createRoom']);
 Route::post('/send_pesan_saja/{id}', [HomeController::class, 'sendMesaage']);
